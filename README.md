@@ -125,9 +125,6 @@ python -m pytest tests/
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -135,14 +132,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - ChromaDB for vector storage capabilities
 - LangChain for the RAG framework
 
-## 📞 Support
-
-If you encounter any issues or have questions, please:
-
-1. Check the [Issues](https://github.com/yourusername/mini-rag/issues) page
-2. Create a new issue with detailed information
-3. Contact the maintainers
-
----
 
 **Happy RAG-ing! 🎉**
