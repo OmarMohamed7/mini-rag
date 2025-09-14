@@ -11,5 +11,5 @@ class Config(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
 
 
-def get_settings():
+def get_config():
     return Config()

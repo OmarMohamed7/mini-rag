@@ -8,10 +8,10 @@ class DataController(BaseController):
         self.size_scale = 1048576
 
     def validate_file(self, file: UploadFile) -> bool:
-        if file.content_type not in self.app_settings.FILE_ALLOWED_EXTENSTIONS:
+        if file.content_type not in self.app_config.FILE_ALLOWED_EXTENSTIONS:
             raise HTTPException(status_code=400, detail="File type not allowed")
 
-        if file.size > self.app_settings.FILE_MAX_SIZE * self.size_scale:
+        if file.size > self.app_config.FILE_MAX_SIZE * self.size_scale:
             raise HTTPException(status_code=400, detail="File size is too large")
 
         if file.size == 0:

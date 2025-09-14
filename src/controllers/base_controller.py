@@ -1,6 +1,6 @@
-from helpers.config import get_settings
+from helpers.config import get_config
 
 
 class BaseController:
     def __init__(self):
-        self.app_settings = get_settings()
+        self.app_config = get_config()
