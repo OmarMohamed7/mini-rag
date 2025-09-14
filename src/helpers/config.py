@@ -7,6 +7,7 @@ class Config(BaseSettings):
     OPENAI_API_KEY: str
     FILE_ALLOWED_EXTENSTIONS: list[str]
     FILE_MAX_SIZE: int
+    FILE_CHUNK_DEFAULT_SIZE: int
 
     model_config = SettingsConfigDict(env_file=".env")
 

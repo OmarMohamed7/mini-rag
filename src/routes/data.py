@@ -14,4 +14,4 @@ async def upload_data(
     app_settings: Config = Depends(get_config),
 ):
     controller = DataController()
-    return controller.upload_data(project_id, file)
+    return await controller.upload_data(project_id, file)
