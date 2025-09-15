@@ -54,9 +54,14 @@ class DataController(BaseController):
 
         file_path = self.generate_file_name(file.filename, project_id)
 
-        async with aiofiles.open(file_path, "wb") as f:
-            while chunk := await file.read(self.app_config.FILE_CHUNK_DEFAULT_SIZE):
-                await f.write(chunk)
+        try:
+            async with aiofiles.open(file_path, "wb") as f:
+                while chunk := await file.read(self.app_config.FILE_CHUNK_DEFAULT_SIZE):
+                    await f.write(chunk)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500, detail=str(ResponseModel.FILE_NOT_UPLOADED.value)
+            )
 
         return {
             "message": ResponseModel.FILE_UPLOADED.value,
