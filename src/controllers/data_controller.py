@@ -56,6 +56,9 @@ class DataController(BaseController):
 
         try:
             async with aiofiles.open(file_path, "wb") as f:
+                # Optimized to not read the entire file into memory
+                # This is a more efficient way to read the file
+                # It reads the file in chunks of the size of the file chunk default size
                 while chunk := await file.read(self.app_config.FILE_CHUNK_DEFAULT_SIZE):
                     await f.write(chunk)
         except Exception as e:

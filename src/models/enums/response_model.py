@@ -11,6 +11,7 @@ class ResponseModel(Enum):
     FILE_TYPE_NOT_ALLOWED = "file type not allowed"
     FILE_NOT_FOUND = "file not found"
     FILE_NOT_UPLOADED = "file not uploaded"
+    FILE_NOT_PROCESSED = "file not processed"
     PROJECT_CREATED = "project created successfully"
     PROJECT_FOUND = "project found"
     PROJECT_NOT_FOUND = "project not found"

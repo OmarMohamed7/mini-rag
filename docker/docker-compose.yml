@@ -1,0 +1,19 @@
+services:
+  mongodb:
+    image: mongo:latest
+    
+    container_name: mongo
+
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo:/data/db
+
+    networks:
+      - rag-network
+
+    restart: always
+  
+networks:
+  rag-network:
+    driver: bridge
