@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File, Depends
+from fastapi import APIRouter, HTTPException, UploadFile, File, Depends, Request
 from helpers.config import get_config, Config
 from controllers import DataController
+from models.db_schemas.project import ProjectSchema
 from models.enums.response_model import ResponseModel
 from .schema.data import ProcessRequestSchema
 from controllers.process_controller import ProcessController
+from models.project_model import ProjectModel
 
 data_router = APIRouter(
     prefix="/api/v1/data",
@@ -12,12 +14,17 @@ data_router = APIRouter(
 
 @data_router.post("/upload/{project_id}")
 async def upload_data(
+    request: Request,
     project_id: str,
     file: UploadFile = File(...),
     app_settings: Config = Depends(get_config),
 ):
+
+    project_model = ProjectModel(request.app.state.mongo_db)
+    project = await project_model.get_or_create_project(project_id)
+
     controller = DataController()
-    return await controller.upload_data(project_id, file)
+    return await controller.upload_data(project.project_id, file)
 
 
 @data_router.post("/process/{project_id}")
@@ -48,3 +55,33 @@ async def process_data(
         )
 
     return file_chunks
+
+
+# @data_router.post("/projects")
+# async def create_project(
+#     project: ProjectSchema,
+#     app_settings: Config = Depends(get_config),
+# ):
+#     project_model = ProjectModel(app_settings.mongo_db)
+#     return await project_model.create_project(project)
+
+
+@data_router.get("/projects")
+async def get_projects(
+    request: Request,
+    page: int = 1,
+    limit: int = 10,
+    app_settings: Config = Depends(get_config),
+):
+    project_model = ProjectModel(request.app.state.mongo_db)
+    return await project_model.get_all_projects(page, limit)
+
+
+@data_router.get("/projects/{project_id}")
+async def get_project(
+    request: Request,
+    project_id: str,
+    app_settings: Config = Depends(get_config),
+):
+    project_model = ProjectModel(request.app.state.mongo_db)
+    return await project_model.get_or_create_project(project_id)

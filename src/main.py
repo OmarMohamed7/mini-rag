@@ -1,11 +1,29 @@
 from fastapi import FastAPI
 import uvicorn
 from routes import base, data
+from helpers.config import get_config
+from motor.motor_asyncio import AsyncIOMotorClient
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup logic
+    print("App started")
+    app.state.app_config = get_config()
+    app.state.mongo_conn = AsyncIOMotorClient(app.state.app_config.MONGODB_URL)
+    app.state.mongo_db = app.state.mongo_conn[app.state.app_config.MONGO_COLLECTION]
+    yield
+    # Shutdown logic
+    print("App shutting down")
+    app.state.mongo_conn.close()
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(base.router)
 app.include_router(data.data_router)
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
