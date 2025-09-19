@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Depends, Request
 from helpers.config import get_config, Config
 from controllers import DataController
+from models.chunk_model import ChunkModel
+from models.db_schemas.data_chunk import DataChunk
 from models.db_schemas.project import ProjectSchema
 from models.enums.response_model import ResponseModel
 from .schema.data import ProcessRequestSchema
@@ -30,18 +32,28 @@ async def upload_data(
 @data_router.post("/process/{project_id}")
 async def process_data(
     project_id: str,
-    request: ProcessRequestSchema,
+    request: Request,
+    process_request: ProcessRequestSchema,
     app_settings: Config = Depends(get_config),
 ):
 
-    file_id = request.file_id
-    chunk_size = request.chunk_size
-    overlap_size = request.overlap_size
+    file_id = process_request.file_id
+    chunk_size = process_request.chunk_size
+    overlap_size = process_request.overlap_size
+    do_reset = process_request.de_reset
+
+    project_model = ProjectModel(request.app.state.mongo_db)
+    await project_model.get_or_create_project(project_id)
 
     controller = ProcessController()
     controller.process_data(project_id=project_id)
 
-    file_content = controller.get_file_content(file_id=request.file_id)
+    chunk_model = ChunkModel(request.app.state.mongo_db)
+
+    if do_reset == 1:
+        return await chunk_model.delete_chunk_by_file_id(file_id)
+
+    file_content = controller.get_file_content(file_id=process_request.file_id)
 
     file_chunks = controller.process_file_content(
         file_content=file_content,
@@ -53,6 +65,19 @@ async def process_data(
         raise HTTPException(
             status_code=400, detail=ResponseModel.FILE_NOT_PROCESSED.value
         )
+
+    file_chunks_records = [
+        DataChunk(
+            project_id=project_id,
+            file_id=file_id,
+            chunk_text=chunk.page_content,
+            chunk_metadata=chunk.metadata,
+            chunk_order=i + 1,
+        )
+        for i, chunk in enumerate(file_chunks)
+    ]
+
+    await chunk_model.insert_chunks(file_chunks_records)
 
     return file_chunks
 

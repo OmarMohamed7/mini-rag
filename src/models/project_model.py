@@ -16,7 +16,7 @@ class ProjectModel(BaseDataModel):
         return project
 
     async def get_or_create_project(self, project_id: str):
-        res = await self.collection.find_one({"project_id": project_id})
+        res = await self.collection.find_one({"_id": project_id})
         if res is None:
             # create project
             project = ProjectSchema()
