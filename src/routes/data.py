@@ -7,6 +7,7 @@ from models.enums.response_model import ResponseModel
 from .schema.data import ProcessRequestSchema
 from controllers.process_controller import ProcessController
 from models.project_model import ProjectModel
+from models.asset_model import AssetModel
 
 data_router = APIRouter(
     prefix="/api/v1/data",
@@ -25,7 +26,9 @@ async def upload_data(
     project = await project_model.get_or_create_project(project_id)
 
     controller = DataController()
-    return await controller.upload_data(project.project_id, file)
+    return await controller.upload_data(
+        project.project_id, client=request.app.state.mongo_db, file=file
+    )
 
 
 @data_router.post("/process/{project_id}")
@@ -108,4 +111,4 @@ async def get_project(
     app_settings: Config = Depends(get_config),
 ):
     project_model = await ProjectModel.create_instance(request.app.state.mongo_db)
-    return await project_model.get_or_create_project(project_id)
+    return await project_model.get_project(project_id)

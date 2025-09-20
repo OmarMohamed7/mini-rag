@@ -28,18 +28,32 @@ class ProjectModel(BaseDataModel):
         return project
 
     async def get_or_create_project(self, project_id: str):
-        res = await self.collection.find_one({"_id": project_id})
+        res = await self.collection.find_one({"project_id": project_id})
         if res is None:
             # create project
-            project = ProjectSchema()
-            project.project_id = project_id
+            project = ProjectSchema(project_id=project_id)
             project_result = await self.create_project(project)
             return project_result
-        else:
-            # convert from dict to model
-            return ProjectSchema(**res)
+
+        # convert from dict to model
+        return ProjectSchema(**res)
+
+    async def get_project(self, project_id: str):
+        res = await self.collection.find_one({"project_id": project_id})
+        if res is None:
+            return None
+        return ProjectSchema(**res)
 
     async def get_all_projects(self, page: int = 1, limit: int = 10):
+
+        # count total number of documents
+        total_documents = await self.collection.count_documents({})
+
+        # calculate total number of pages
+        total_pages = total_documents // limit
+        if total_documents % limit > 0:
+            total_pages += 1
+
         res = (
             await self.collection.find()
             .skip((page - 1) * limit)
@@ -47,4 +61,4 @@ class ProjectModel(BaseDataModel):
             .to_list(length=None)
         )
 
-        return [ProjectSchema(**project) for project in res]
+        return [ProjectSchema(**project) for project in res], total_pages

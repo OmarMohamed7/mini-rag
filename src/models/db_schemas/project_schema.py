@@ -1,11 +1,13 @@
+from typing import Optional
+from bson.objectid import ObjectId
 from pydantic import Field
 from pymongo import IndexModel
 from models.db_schemas.base_schema import BaseSchema
 
 
 class ProjectSchema(BaseSchema):
-    project_id: str | None = Field(default=None, alias="_id")
-    name: str | None = None
+    id: Optional[ObjectId] = Field(None, alias="_id")
+    project_id: str = Field(..., min_length=1)
 
     @classmethod
     def get_indexes(cls):

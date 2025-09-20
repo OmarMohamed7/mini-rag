@@ -1,4 +1,7 @@
+from motor.motor_asyncio import AsyncIOMotorClient
 from controllers.project_controller import ProjectController
+from models.asset_model import AssetModel
+from models.db_schemas.asset_schema import AssetSchema
 from .base_controller import BaseController
 from fastapi import UploadFile, File, HTTPException
 from models import ResponseModel
@@ -45,7 +48,9 @@ class DataController(BaseController):
 
         return file_path
 
-    async def upload_data(self, project_id: str, file: UploadFile = File(...)) -> dict:
+    async def upload_data(
+        self, project_id: str, client: AsyncIOMotorClient, file: UploadFile = File(...)
+    ) -> dict:
 
         if not await self.validate_file(file):
             raise HTTPException(
@@ -61,7 +66,18 @@ class DataController(BaseController):
                 # It reads the file in chunks of the size of the file chunk default size
                 while chunk := await file.read(self.app_config.FILE_CHUNK_DEFAULT_SIZE):
                     await f.write(chunk)
+
+            asset_model = await AssetModel.create_instance(client)
+            asset = AssetSchema(
+                asset_project_id=project_id,
+                asset_name=file.filename,
+                asset_type="File",
+                asset_size=file.size,
+            )
+            final_asset = await asset_model.create_asset(asset)
+
         except Exception as e:
+            os.remove(file_path)
             raise HTTPException(
                 status_code=500, detail=str(ResponseModel.FILE_NOT_UPLOADED.value)
             )
@@ -69,8 +85,8 @@ class DataController(BaseController):
         return {
             "message": ResponseModel.FILE_UPLOADED.value,
             "project_id": project_id,
-            "file": file_path.split("/")[-1],
             "project_path": file_path,
+            "file_id": str(final_asset.inserted_id),
         }
 
     def get_clean_file_name(self, file_name: str) -> str:
