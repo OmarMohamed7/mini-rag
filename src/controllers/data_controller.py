@@ -2,6 +2,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from controllers.project_controller import ProjectController
 from models.asset_model import AssetModel
 from models.db_schemas.asset_schema import AssetSchema
+from models.db_schemas.project_schema import ProjectSchema
 from .base_controller import BaseController
 from fastapi import UploadFile, File, HTTPException
 from models import ResponseModel
@@ -49,7 +50,10 @@ class DataController(BaseController):
         return file_path
 
     async def upload_data(
-        self, project_id: str, client: AsyncIOMotorClient, file: UploadFile = File(...)
+        self,
+        project: ProjectSchema,
+        client: AsyncIOMotorClient,
+        file: UploadFile = File(...),
     ) -> dict:
 
         if not await self.validate_file(file):
@@ -57,7 +61,7 @@ class DataController(BaseController):
                 status_code=400, detail=ResponseModel.FILE_NOT_VALIDATED.value
             )
 
-        file_path = self.generate_file_name(file.filename, project_id)
+        file_path = self.generate_file_name(file.filename, project.project_id)
 
         try:
             async with aiofiles.open(file_path, "wb") as f:
@@ -69,8 +73,8 @@ class DataController(BaseController):
 
             asset_model = await AssetModel.create_instance(client)
             asset = AssetSchema(
-                asset_project_id=project_id,
-                asset_name=file.filename,
+                asset_project_id=project.id,
+                asset_name=file_path.split("/")[-1],
                 asset_type="File",
                 asset_size=file.size,
             )
@@ -84,9 +88,10 @@ class DataController(BaseController):
 
         return {
             "message": ResponseModel.FILE_UPLOADED.value,
-            "project_id": project_id,
+            "project_id": project.project_id,
             "project_path": file_path,
-            "file_id": str(final_asset.inserted_id),
+            "file_id": str(final_asset.id),
+            "project": str(project.id),
         }
 
     def get_clean_file_name(self, file_name: str) -> str:

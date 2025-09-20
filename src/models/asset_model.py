@@ -1,3 +1,4 @@
+from bson import ObjectId
 from models.base_data_model import BaseDataModel
 from models.db_schemas.asset_schema import AssetSchema
 from models.enums.database_enum import DatabaseEnum
@@ -33,11 +34,13 @@ class AssetModel(BaseDataModel):
             return None
         return AssetSchema(**res)
 
-    async def get_project_assets(self, project_id: str, page: int = 1, limit: int = 10):
+    async def get_project_assets(
+        self, project_id: str, asset_type: str = "File", page: int = 1, limit: int = 10
+    ):
 
         # count total number of documents
         total_documents = await self.collection.count_documents(
-            {"asset_project_id": project_id}
+            {"asset_project_id": ObjectId(project_id), "asset_type": asset_type}
         )
 
         # calculate total number of pages
@@ -46,13 +49,23 @@ class AssetModel(BaseDataModel):
             total_pages += 1
 
         res = (
-            await self.collection.find({"asset_project_id": project_id})
-            .to_list(length=None)
+            await self.collection.find(
+                {"asset_project_id": ObjectId(project_id), "asset_type": asset_type}
+            )
             .skip((page - 1) * limit)
             .limit(limit)
+            .to_list(length=None)
         )
 
         return [AssetSchema(**asset) for asset in res], total_pages
+
+    async def get_asset_by_type(self, asset_type: str):
+        res = await self.collection.find({"asset_type": asset_type}).to_list(
+            length=None
+        )
+        if res is None:
+            return None
+        return [AssetSchema(**asset) for asset in res]
 
     async def get_all_assets(self):
         return await self.collection.find().to_list(length=None)

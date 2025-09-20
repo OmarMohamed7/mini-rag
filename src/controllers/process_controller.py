@@ -12,20 +12,21 @@ from models import AllowedFileExtensions
 
 class ProcessController(BaseController):
 
-    def __init__(self):
+    def __init__(self, project_id: str):
         super().__init__()
-
-    def process_data(self, project_id: str):
         self.project_id = project_id
         self.project_path = ProjectController().get_project(project_id)
 
     def get_file_extension(self, file_id: str):
         return os.path.splitext(file_id)[-1]
 
-    def get_file_loader(self, file_id: str):
-        file_extension = self.get_file_extension(file_id)
+    def get_file_loader(self, file_name: str):
+        file_extension = self.get_file_extension(file_name)
 
-        file_path = os.path.join(self.project_path, file_id)
+        file_path = os.path.join(self.project_path, file_name)
+
+        if not os.path.exists(file_path):
+            raise ValueError(f"File not found: {file_path}")
 
         if file_extension == AllowedFileExtensions.PDF.value:
             return PyMuPDFLoader(file_path)
@@ -36,8 +37,10 @@ class ProcessController(BaseController):
         else:
             raise ValueError(f"Unsupported file extension: {file_extension}")
 
-    def get_file_content(self, file_id: str):
-        loader = self.get_file_loader(file_id)
+    def get_file_content(self, file_name: str):
+        loader = self.get_file_loader(file_name)
+        if loader is None:
+            return None
         return loader.load()
 
     def process_file_content(
