@@ -24,7 +24,7 @@ class ProjectModel(BaseDataModel):
         res = await self.collection.insert_one(
             project.model_dump(by_alias=True, exclude_none=True)
         )
-        project.project_id = str(res.inserted_id)
+        project.id = res.inserted_id
         return project
 
     async def get_or_create_project(self, project_id: str):

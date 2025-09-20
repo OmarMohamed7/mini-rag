@@ -27,7 +27,7 @@ async def upload_data(
 
     controller = DataController()
     return await controller.upload_data(
-        project.project_id, client=request.app.state.mongo_db, file=file
+        project=project, client=request.app.state.mongo_db, file=file
     )
 
 

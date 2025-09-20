@@ -21,12 +21,17 @@ class AssetModel(BaseDataModel):
             await self.collection.create_indexes(AssetSchema.get_indexes())
 
     async def create_asset(self, asset: AssetSchema):
-        return await self.collection.insert_one(
+        res = await self.collection.insert_one(
             asset.model_dump(by_alias=True, exclude_none=True)
         )
+        asset.id = res.inserted_id
+        return asset
 
     async def get_asset(self, asset_id: str):
-        return await self.collection.find_one({"_id": asset_id})
+        res = await self.collection.find_one({"_id": asset_id})
+        if res is None:
+            return None
+        return AssetSchema(**res)
 
     async def get_project_assets(self, project_id: str, page: int = 1, limit: int = 10):
 

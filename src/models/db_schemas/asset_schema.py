@@ -9,7 +9,7 @@ from models.db_schemas.base_schema import BaseSchema
 
 class AssetSchema(BaseSchema):
     id: Optional[ObjectId] = Field(default=None, alias="_id")
-    asset_project_id: str
+    asset_project_id: ObjectId
     asset_name: str
     asset_type: str
     asset_created_at: datetime = Field(default=datetime.now())
