@@ -22,7 +22,7 @@ async def upload_data(
     app_settings: Config = Depends(get_config),
 ):
 
-    project_model = ProjectModel(request.app.state.mongo_db)
+    project_model = await ProjectModel.create_instance(request.app.state.mongo_db)
     project = await project_model.get_or_create_project(project_id)
 
     controller = DataController()
@@ -42,13 +42,13 @@ async def process_data(
     overlap_size = process_request.overlap_size
     do_reset = process_request.de_reset
 
-    project_model = ProjectModel(request.app.state.mongo_db)
+    project_model = await ProjectModel.create_instance(request.app.state.mongo_db)
     await project_model.get_or_create_project(project_id)
 
     controller = ProcessController()
     controller.process_data(project_id=project_id)
 
-    chunk_model = ChunkModel(request.app.state.mongo_db)
+    chunk_model = await ChunkModel.create_instance(request.app.state.mongo_db)
 
     if do_reset == 1:
         return await chunk_model.delete_chunk_by_file_id(file_id)
@@ -98,7 +98,7 @@ async def get_projects(
     limit: int = 10,
     app_settings: Config = Depends(get_config),
 ):
-    project_model = ProjectModel(request.app.state.mongo_db)
+    project_model = await ProjectModel.create_instance(request.app.state.mongo_db)
     return await project_model.get_all_projects(page, limit)
 
 
@@ -108,5 +108,5 @@ async def get_project(
     project_id: str,
     app_settings: Config = Depends(get_config),
 ):
-    project_model = ProjectModel(request.app.state.mongo_db)
+    project_model = await ProjectModel.create_instance(request.app.state.mongo_db)
     return await project_model.get_or_create_project(project_id)
