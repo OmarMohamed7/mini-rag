@@ -2,10 +2,10 @@ from operator import gt
 from pydantic import Field
 from pymongo import IndexModel
 
-from models.db_schemas.base_schema_model import BaseSchemaModel
+from models.db_schemas.base_schema import BaseSchema
 
 
-class DataChunk(BaseSchemaModel):
+class DataChunkSchema(BaseSchema):
     project_id: str = Field(..., min_length=1)
     file_id: str = Field(..., min_length=1)
     chunk_text: str = Field(..., min_length=1)

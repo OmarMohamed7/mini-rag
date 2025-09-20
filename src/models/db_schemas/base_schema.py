@@ -3,7 +3,7 @@ from bson.objectid import ObjectId
 from pydantic import BaseModel
 
 
-class BaseSchemaModel(BaseModel):
+class BaseSchema(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True

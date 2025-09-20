@@ -1,5 +1,5 @@
 from models.base_data_model import BaseDataModel
-from models.db_schemas.project import ProjectSchema
+from models.db_schemas.project_schema import ProjectSchema
 from models.enums.database_enum import DatabaseEnum
 
 

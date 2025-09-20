@@ -1,9 +1,9 @@
 from pydantic import Field
 from pymongo import IndexModel
-from models.db_schemas.base_schema_model import BaseSchemaModel
+from models.db_schemas.base_schema import BaseSchema
 
 
-class ProjectSchema(BaseSchemaModel):
+class ProjectSchema(BaseSchema):
     project_id: str | None = Field(default=None, alias="_id")
     name: str | None = None
 

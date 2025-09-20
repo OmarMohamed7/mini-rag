@@ -1,5 +1,5 @@
 from models.base_data_model import BaseDataModel
-from models.db_schemas.data_chunk import DataChunk
+from models.db_schemas.data_chunk_schema import DataChunkSchema
 from models.enums.database_enum import DatabaseEnum
 from pymongo import InsertOne
 
@@ -19,9 +19,9 @@ class ChunkModel(BaseDataModel):
         all_collections = await self.db_client.list_collection_names()
         if DatabaseEnum.DATA_CHUNK.value not in all_collections:
             self.collection = self.db_client[DatabaseEnum.DATA_CHUNK.value]
-            await self.collection.create_indexes(DataChunk.get_indexes())
+            await self.collection.create_indexes(DataChunkSchema.get_indexes())
 
-    def create_chunk(self, chunk: DataChunk):
+    def create_chunk(self, chunk: DataChunkSchema):
         return self.collection.insert_one(
             chunk.model_dump(by_alias=True, exclude_none=True)
         )
@@ -29,7 +29,7 @@ class ChunkModel(BaseDataModel):
     def get_chunck(self, chunk_id: str):
         return self.collection.find_one({"chunk_id": chunk_id})
 
-    async def insert_chunks(self, chunks: list[DataChunk], batch_size: int = 100):
+    async def insert_chunks(self, chunks: list[DataChunkSchema], batch_size: int = 100):
         for i in range(0, len(chunks), batch_size):
             batch = chunks[i : i + batch_size]
 

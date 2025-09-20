@@ -2,8 +2,7 @@ from fastapi import APIRouter, HTTPException, UploadFile, File, Depends, Request
 from helpers.config import get_config, Config
 from controllers import DataController
 from models.chunk_model import ChunkModel
-from models.db_schemas.data_chunk import DataChunk
-from models.db_schemas.project import ProjectSchema
+from models.db_schemas.data_chunk_schema import DataChunkSchema
 from models.enums.response_model import ResponseModel
 from .schema.data import ProcessRequestSchema
 from controllers.process_controller import ProcessController
@@ -67,7 +66,7 @@ async def process_data(
         )
 
     file_chunks_records = [
-        DataChunk(
+        DataChunkSchema(
             project_id=project_id,
             file_id=file_id,
             chunk_text=chunk.page_content,
