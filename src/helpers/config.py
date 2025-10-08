@@ -27,6 +27,9 @@ class Config(BaseSettings):
     GENERATION_DEFAULT_MAX_TOKENS: int
     GENERATION_DEFAULT_TEMPERATURE: float
 
+    VECTOR_DB_BACKEND: str
+    VECTOR_DB_PATH: str
+
     model_config = SettingsConfigDict(env_file=".env")
 
 
