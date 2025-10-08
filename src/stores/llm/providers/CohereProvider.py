@@ -1,22 +1,21 @@
 from stores.llm import LLMInterface
-from openai import OpenAI
 import logging
 
-from stores.llm.LLMEnums import OPENAIEnums
+import cohere
+
+from stores.llm.LLMEnums import COHEREEnums, DocumentTypesEnums
 
 
-class OpenAIProvider(LLMInterface):
+class CohereProvider(LLMInterface):
     def __init__(
         self,
         api_key: str,
-        api_url: str = None,
         default_input_max_chars: int = 1000,
         default_generation_max_output_tokens: int = 1000,
         default_generation_temperature: float = 0.1,
     ):
         super().__init__()
         self.api_key = api_key
-        self.api_url = api_url
         self.default_generation_max_output_tokens = default_generation_max_output_tokens
         self.default_generation_temperature = default_generation_temperature
         self.default_input_max_chars = default_input_max_chars
@@ -25,7 +24,7 @@ class OpenAIProvider(LLMInterface):
         self.default_embedding_model_id = None
         self.embedding_size = None
 
-        self.client = OpenAI(api_key=api_key, api_url=api_url)
+        self.client = cohere.Client(api_key=api_key)
 
         self.logger = logging.getLogger(__name__)
 
@@ -54,61 +53,43 @@ class OpenAIProvider(LLMInterface):
             self.logger.error("Generation model not initialized")
             raise ValueError("Generation model not initialized")
 
-        max_output_tokens = (
-            max_output_tokens or self.default_generation_max_output_tokens
-        )
-
-        temperature = temperature or self.default_generation_temperature
-
-        chat_history.append(
-            self.construct_prompt(prompt=prompt, role=OPENAIEnums.USER.value)
-        )
-
-        response = self.client.chat.completions.create(
+        response = self.client.chat(
             model=self.generation_model_id,
-            messages=chat_history,
-            max_tokens=max_output_tokens,
-            temperature=temperature,
+            chat_history=chat_history,
+            message=self.process_text(prompt),
         )
 
-        if (
-            not response
-            or not response.choices
-            or len(response.choices) == 0
-            or not response.choices[0].message.content
-        ):
+        if not response or not response.text:
             self.logger.error("No response from generation model")
             raise ValueError("No response from generation model")
 
-        if (
-            not response
-            or not response.choices
-            or len(response.choices) == 0
-            or not response.choices[0].message.content
-        ):
-            self.logger.error("No response from generation model")
-            raise ValueError("No response from generation model")
-
-        return response.choices[0].message.content
+        return response.text
 
     def embed_text(self, text: str, document_type: str = None):
         if not self.client:
             self.logger.error("Client not initialized")
             raise ValueError("Client not initialized")
 
-        response = self.client.embeddings.create(
-            input=text, model=self.embedding_model_id
+        if not self.embedding_model_id:
+            self.logger.error("Embedding model not initialized")
+            raise ValueError("Embedding model not initialized")
+
+        input_type = COHEREEnums.DOCUMENT.value
+        if document_type == DocumentTypesEnums.QUERY.value:
+            input_type = COHEREEnums.QUERY.value
+
+        response = self.client.embed(
+            model=self.embedding_model_id,
+            texts=[self.process_text(text)],
+            input_type=input_type,
+            embedding_type=["float"],
         )
-        if (
-            not response
-            or not response.data
-            or len(response.data) == 0
-            or not response.data[0].embedding
-        ):
+
+        if not response or not response.embeddings or not response.embeddings.float:
             self.logger.error("No response from embedding model")
             raise ValueError("No response from embedding model")
 
-        return response.data[0].embedding
+        return response.embeddings.float[0]
 
     def construct_prompt(self, prompt: str, role: str):
         return {
