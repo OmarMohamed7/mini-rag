@@ -8,12 +8,5 @@ class VectorDBEnums(Enum):
 
 
 class DistanceMethodsEnums(Enum):
-    COSINE = "cosine"
-    EUCLIDEAN = "euclidean"
-    MANHATTAN = "manhattan"
-    CHEBYSHEV = "chebyshev"
-    MINKOWSKI = "minkowski"
-    DOT = "dot"
-    HAMMING = "hamming"
-    JACCARD = "jaccard"
-    TANIMOTO = "tanimoto"
+    COSINE = "Cosine"
+    DOT = "Dot"

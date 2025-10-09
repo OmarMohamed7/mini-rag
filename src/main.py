@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 import uvicorn
-from routes import base, data
+from routes import base, data, nlp
 from helpers.config import get_config
 from motor.motor_asyncio import AsyncIOMotorClient
 from contextlib import asynccontextmanager
@@ -55,7 +55,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(base.router)
 app.include_router(data.data_router)
-
+app.include_router(nlp.nlp_router)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
