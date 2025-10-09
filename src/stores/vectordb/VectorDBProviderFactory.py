@@ -1,4 +1,4 @@
-from stores.vectordb import VectorDBEnums
+from stores.vectordb.VectorDBEnums import DistanceMethodsEnums, VectorDBEnums
 from stores.vectordb.providers.QuadrantDB import QdrantDBProvider
 from controllers.base_controller import BaseController
 
@@ -15,7 +15,7 @@ class VectorDBProviderFactory:
             )
             return QdrantDBProvider(
                 db_path=db_path,
-                distance_method=VectorDBEnums.DistanceMethodsEnums.COSINE,
+                distance_method=DistanceMethodsEnums.COSINE,
             )
 
         raise ValueError(f"Invalid provider: {provider}")

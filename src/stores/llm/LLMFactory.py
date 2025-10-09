@@ -1,4 +1,4 @@
-from stores.llm import LLMEnums
+from stores.llm.LLMEnums import LLMEnums
 from stores.llm.providers import CohereProvider, OpenAIProvider
 
 

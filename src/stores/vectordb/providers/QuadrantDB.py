@@ -1,8 +1,8 @@
-from typing import List
 from stores.vectordb import VectorDBInterface
 from qdrant_client import QdrantClient, models
-from stores.vectordb.VectorDBEnums import DistanceMethodsEnums
 import logging
+
+from stores.vectordb.VectorDBEnums import DistanceMethodsEnums
 
 
 class QdrantDBProvider(VectorDBInterface):
@@ -30,7 +30,7 @@ class QdrantDBProvider(VectorDBInterface):
     def is_collection_exists(self, collection_name: str) -> bool:
         return self.client.collection_exists(collection_name=collection_name)
 
-    def get_all_collections(self) -> List[str]:
+    def get_all_collections(self) -> list[str]:
         return self.client.get_collections()
 
     def get_collection_details(self, collection_name: str) -> dict:
@@ -62,7 +62,7 @@ class QdrantDBProvider(VectorDBInterface):
         self,
         collection_name: str,
         text: str,
-        vector: List,
+        vector: list,
         metadata: dict = None,
         record_id: str = None,
     ) -> bool:
@@ -92,10 +92,10 @@ class QdrantDBProvider(VectorDBInterface):
     def insert_many(
         self,
         collection_name: str,
-        texts: List,
-        vectors: List,
-        metadata: List = None,
-        record_ids: List = None,
+        texts: list,
+        vectors: list,
+        metadata: list = None,
+        record_ids: list = None,
         batch_size: int = 50,
     ) -> bool:
         try:
@@ -134,9 +134,9 @@ class QdrantDBProvider(VectorDBInterface):
     def search_by_vector(
         self,
         collection_name: str,
-        vector: List,
+        vector: list,
         limit: int = 10,
-    ) -> List[dict]:
+    ) -> list[dict]:
         try:
             return self.client.search(
                 collection_name=collection_name, query_vector=vector, limit=limit

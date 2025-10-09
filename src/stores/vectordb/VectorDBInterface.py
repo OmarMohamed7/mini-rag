@@ -1,7 +1,4 @@
-from stores.vectordb import VectorDBEnums
-from stores.vectordb.providers import PineconeProvider, QdrantProvider
 from abc import ABC, abstractmethod
-from typing import List
 
 
 class VectorDBInterface(ABC):
@@ -19,7 +16,7 @@ class VectorDBInterface(ABC):
         pass
 
     @abstractmethod
-    def get_all_collections(self) -> List[str]:
+    def get_all_collections(self) -> list[str]:
         pass
 
     @abstractmethod
@@ -41,7 +38,7 @@ class VectorDBInterface(ABC):
         self,
         collection_name: str,
         text: str,
-        vector: List,
+        vector: list,
         metadata: dict = None,
         record_id: str = None,
     ) -> bool:
@@ -51,10 +48,10 @@ class VectorDBInterface(ABC):
     def insert_many(
         self,
         collection_name: str,
-        texts: List,
-        vectors: List,
-        metadata: List = None,
-        record_ids: List = None,
+        texts: list,
+        vectors: list,
+        metadata: list = None,
+        record_ids: list = None,
         batch_size: int = 50,
     ) -> bool:
         pass
@@ -63,7 +60,7 @@ class VectorDBInterface(ABC):
     def search_by_vector(
         self,
         collection_name: str,
-        vector: List,
+        vector: list,
         limit: int = 10,
-    ) -> List[dict]:
+    ) -> list[dict]:
         pass
