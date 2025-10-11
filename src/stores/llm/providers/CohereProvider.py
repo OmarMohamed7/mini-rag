@@ -26,6 +26,8 @@ class CohereProvider(LLMInterface):
 
         self.client = cohere.Client(api_key=api_key)
 
+        self.enums = COHEREEnums
+
         self.logger = logging.getLogger(__name__)
 
     def set_generation_model(self, model_id: str):
@@ -94,5 +96,5 @@ class CohereProvider(LLMInterface):
     def construct_prompt(self, prompt: str, role: str):
         return {
             "role": role,
-            "content": self.process_text(prompt),
+            "message": self.process_text(prompt),
         }

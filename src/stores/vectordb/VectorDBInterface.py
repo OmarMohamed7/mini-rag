@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from models.db_schemas.retrieve_documents_schema import RetrieveDocumentsSchema
+
 
 class VectorDBInterface(ABC):
 
@@ -62,5 +64,5 @@ class VectorDBInterface(ABC):
         collection_name: str,
         vector: list,
         limit: int = 10,
-    ) -> list[dict]:
+    ) -> list[RetrieveDocumentsSchema]:
         pass

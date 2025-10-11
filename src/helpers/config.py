@@ -29,6 +29,8 @@ class Config(BaseSettings):
     VECTOR_DB_BACKEND: str
     VECTOR_DB_PATH: str
 
+    DEFAULT_LOCALE: str
+
     model_config = SettingsConfigDict(env_file=".env")
 
 

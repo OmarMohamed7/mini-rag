@@ -31,6 +31,7 @@ async def index_project(
         vector_db_client=request.app.state.vector_db_client,
         generation_client=request.app.state.genration_client,
         embedding_client=request.app.state.embedding_client,
+        template_parser=request.app.state.template_parser,
     )
 
     chunk_model = await ChunkModel.create_instance(request.app.state.mongo_db)
@@ -88,13 +89,14 @@ async def get_project_index_info(request: Request, project_id: str):
         vector_db_client=request.app.state.vector_db_client,
         generation_client=request.app.state.genration_client,
         embedding_client=request.app.state.embedding_client,
+        template_parser=request.app.state.template_parser,
     )
 
     return nlp_controller.get_vector_db_collection_info(project.project_id)
 
 
 @nlp_router.post("/index/search/{project_id}")
-async def search_project_index(
+async def search_project_db_collection(
     request: Request, project_id: str, search_request: SearchRequestSchema
 ):
 
@@ -111,11 +113,55 @@ async def search_project_index(
         vector_db_client=request.app.state.vector_db_client,
         generation_client=request.app.state.genration_client,
         embedding_client=request.app.state.embedding_client,
+        template_parser=request.app.state.template_parser,
     )
 
-    return nlp_controller.search_project_index(
+    return nlp_controller.search_project_db_collection(
         project.project_id,
         text=search_request.text,
         limit=search_request.limit,
         offset=search_request.offset,
+    )
+
+
+@nlp_router.post("/index/answer/{project_id}")
+async def answer_rag_question(
+    request: Request, project_id: str, search_request: SearchRequestSchema
+):
+
+    project_model = await ProjectModel.create_instance(request.app.state.mongo_db)
+    project = await project_model.get_project(project_id)
+
+    if project is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Project not found"},
+        )
+
+    nlp_controller = NLPController(
+        vector_db_client=request.app.state.vector_db_client,
+        generation_client=request.app.state.genration_client,
+        embedding_client=request.app.state.embedding_client,
+        template_parser=request.app.state.template_parser,
+    )
+
+    answer, full_prompt, chat_hitory = nlp_controller.answer_rag_question(
+        project=project,
+        text=search_request.text,
+        limit=search_request.limit,
+        offset=search_request.offset,
+    )
+    if answer is None:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "Answer not found"},
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "answer": answer,
+            "full_prompt": full_prompt,
+            "chat_hitory": chat_hitory,
+        },
     )

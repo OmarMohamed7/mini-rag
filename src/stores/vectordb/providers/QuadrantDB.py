@@ -1,3 +1,4 @@
+from models.db_schemas.retrieve_documents_schema import RetrieveDocumentsSchema
 from stores.vectordb import VectorDBInterface
 from qdrant_client import QdrantClient, models
 import logging
@@ -138,9 +139,18 @@ class QdrantDBProvider(VectorDBInterface):
         limit: int = 10,
     ) -> list[dict]:
         try:
-            return self.client.search(
+            res = self.client.search(
                 collection_name=collection_name, query_vector=vector, limit=limit
             )
+
+            if not res or len(res) == 0:
+                return None
+
+            return [
+                RetrieveDocumentsSchema(text=result.payload["text"], score=result.score)
+                for result in res
+            ]
+
         except Exception as e:
             self.logger.error(f"Error searching by vector: {e}")
             return []
