@@ -2,7 +2,6 @@ import os
 
 from langchain_core.documents import Document
 from .base_controller import BaseController
-from routes.schema.data import ProcessRequestSchema
 from controllers.project_controller import ProjectController
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_community.document_loaders import TextLoader

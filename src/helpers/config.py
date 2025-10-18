@@ -12,6 +12,25 @@ class Config(BaseSettings):
     MONGODB_URL: str
     MONGO_COLLECTION: str
 
+    GENERATION_BACKEND: str
+    EMBEDDING_BACKEND: str
+
+    OPENAI_API_KEY: str
+    OPENAI_API_URL: str
+    COHERE_API_KEY: str
+
+    GENERATION_MODEL_ID: str
+    EMBEDDING_MODEL_ID: str
+    EMBEDDING_MODEL_SIZE: int
+
+    GENERATION_DEFAULT_MAX_TOKENS: int
+    GENERATION_DEFAULT_TEMPERATURE: float
+
+    VECTOR_DB_BACKEND: str
+    VECTOR_DB_PATH: str
+
+    DEFAULT_LOCALE: str
+
     model_config = SettingsConfigDict(env_file=".env")
 
 

@@ -26,8 +26,22 @@ class ChunkModel(BaseDataModel):
             chunk.model_dump(by_alias=True, exclude_none=True)
         )
 
-    def get_chunck(self, chunk_id: str):
-        return self.collection.find_one({"chunk_id": chunk_id})
+    async def get_chunck(self, chunk_project_id: str, page: int = 1, limit: int = 10):
+        total_documents = await self.collection.count_documents(
+            {"project_id": chunk_project_id}
+        )
+
+        total_pages = total_documents // limit
+        if total_documents % limit > 0:
+            total_pages += 1
+
+        res = (
+            await self.collection.find({"project_id": chunk_project_id})
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .to_list(length=None)
+        )
+        return [DataChunkSchema(**chunk) for chunk in res], total_pages
 
     async def insert_chunks(self, chunks: list[DataChunkSchema], batch_size: int = 100):
         for i in range(0, len(chunks), batch_size):
