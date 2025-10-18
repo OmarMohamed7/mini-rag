@@ -25,6 +25,7 @@ document_prompt = Template(
         [
             "## Document $doc_num",
             "### Content: $chunk_text",
+            " ",
         ]
     )
 )
@@ -35,7 +36,6 @@ footer_prompt = Template(
     "\n".join(
         [
             "Based Only on the above documents, please generate an answer for the user.",
-            "## Answer: ",
         ]
     )
 )

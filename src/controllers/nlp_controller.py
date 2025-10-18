@@ -122,6 +122,7 @@ class NLPController(BaseController):
         footer_prompt = self.template_parser.get_template(
             template="rag",
             key="footer_prompt",
+            vars={"query": text},
         )
 
         chat_hitory = [
@@ -130,7 +131,13 @@ class NLPController(BaseController):
             )
         ]
 
-        full_prompt = "\n\n".join([document_prompt, footer_prompt])
+        full_prompt = "\n\n".join(
+            [
+                text,
+                document_prompt,
+                footer_prompt,
+            ]
+        )
 
         answer = self.generation_client.generate_text(
             prompt=full_prompt,
