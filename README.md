@@ -18,12 +18,14 @@ A lightweight implementation of a Retrieval-Augmented Generation system that com
 ## 🛠️ Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <your-repo-url>
    cd mini-rag
    ```
 
 2. **Create and activate virtual environment**
+
    ```bash
    python3 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -37,11 +39,13 @@ A lightweight implementation of a Retrieval-Augmented Generation system that com
 ## 🚀 Quick Start
 
 1. **Activate your virtual environment**
+
    ```bash
    source venv/bin/activate
    ```
 
 2. **Run the application**
+
    ```bash
    python app.py
    ```
@@ -88,49 +92,25 @@ CHUNK_OVERLAP=200
 
 ## 🧪 API Endpoints
 
-- `POST /upload` - Upload and process documents
+- `POST /upload` - Upload documents
+- `POST /process` - process documents
 - `POST /query` - Ask questions and get answers
 - `GET /documents` - List all processed documents
 - `DELETE /documents/<id>` - Remove a document
-
-## 🛠️ Development
-
-### Running in Development Mode
-
-```bash
-export FLASK_ENV=development
-python app.py
-```
-
-### Running Tests
-
-```bash
-python -m pytest tests/
-```
 
 ## 📦 Dependencies
 
 - **Flask**: Web framework
 - **OpenAI**: Language model API
-- **ChromaDB**: Vector database
+- **QdrantDB**: Vector database
 - **LangChain**: Document processing and retrieval
 - **Pandas**: Data manipulation
 - **NumPy**: Numerical computing
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-
 ## 🙏 Acknowledgments
 
 - OpenAI for providing the language models
-- ChromaDB for vector storage capabilities
+- QdrantDB for vector storage capabilities
 - LangChain for the RAG framework
-
 
 **Happy RAG-ing! 🎉**

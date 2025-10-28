@@ -22,12 +22,12 @@ async def upload_data(
     app_settings: Config = Depends(get_config),
 ):
 
-    project_model = await ProjectModel.create_instance(request.app.state.mongo_db)
+    project_model = await ProjectModel.create_instance(request.app.state.db_client)
     project = await project_model.get_or_create_project(project_id)
 
     controller = DataController()
     return await controller.upload_data(
-        project=project, client=request.app.state.mongo_db, file=file
+        project=project, client=request.app.state.db_client, file=file
     )
 
 
@@ -44,12 +44,12 @@ async def process_data(
     do_reset = process_request.de_reset
 
     project_model = await ProjectModel.create_instance(
-        db_client=request.app.state.mongo_db
+        db_client=request.app.state.db_client
     )
     project = await project_model.get_or_create_project(project_id)
 
     project_file_ids = []
-    asset_model = await AssetModel.create_instance(request.app.state.mongo_db)
+    asset_model = await AssetModel.create_instance(request.app.state.db_client)
 
     # if file_id is provided, process only that file
     # if file_id is not provided, process all files in the project
@@ -71,7 +71,7 @@ async def process_data(
 
     controller = ProcessController(project_id=project.project_id)
 
-    chunk_model = await ChunkModel.create_instance(request.app.state.mongo_db)
+    chunk_model = await ChunkModel.create_instance(request.app.state.db_client)
 
     deleted_chunks = 0
     processed_files = 0
@@ -131,7 +131,7 @@ async def get_projects(
     limit: int = 10,
     app_settings: Config = Depends(get_config),
 ):
-    project_model = await ProjectModel.create_instance(request.app.state.mongo_db)
+    project_model = await ProjectModel.create_instance(request.app.state.db_client)
     return await project_model.get_all_projects(page, limit)
 
 
@@ -141,5 +141,5 @@ async def get_project(
     project_id: str,
     app_settings: Config = Depends(get_config),
 ):
-    project_model = await ProjectModel.create_instance(request.app.state.mongo_db)
+    project_model = await ProjectModel.create_instance(request.app.state.db_client)
     return await project_model.get_project(project_id)
