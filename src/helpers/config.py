@@ -9,8 +9,13 @@ class Config(BaseSettings):
     FILE_MAX_SIZE: int
     FILE_CHUNK_DEFAULT_SIZE: int
 
-    MONGODB_URL: str
-    MONGO_COLLECTION: str
+    # MONGODB_URL: str
+    # MONGO_COLLECTION: str
+    POSTGRES_USERNAME: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_HOST: str
+    POSTGRES_PORT: int
+    POSTGRES_MAIN_DATABASE: str
 
     GENERATION_BACKEND: str
     EMBEDDING_BACKEND: str

@@ -1,23 +1,39 @@
 services:
-  mongodb:
-    image: mongo:latest
+  # mongodb:
+  #   image: mongo:latest
     
-    container_name: mongo
+  #   container_name: mongo
 
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - ./mongo:/data/db
+
+  #   networks:
+  #     - rag-network
+
+  #   environment:
+  #     - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+  #     - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+
+  #   restart: always
+
+
+  pgvector:
+    image: pgvector/pgvector:pg18-trixie
+    container_name: pgvector
     ports:
-      - "27017:27017"
+      - "5432:5432"
     volumes:
-      - ./mongo:/data/db
-
+      - pgvector-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
       - rag-network
-
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-
-    restart: always
   
 networks:
   rag-network:
     driver: bridge
+  
+volumes:
+  pgvector-data:

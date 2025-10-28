@@ -2,12 +2,14 @@ from fastapi import FastAPI
 import uvicorn
 from routes import base, data, nlp
 from helpers.config import get_config
-from motor.motor_asyncio import AsyncIOMotorClient
 from contextlib import asynccontextmanager
 
 from stores.llm import LLMFactory
 from stores.llm.templates.template_parser import TemplateParser
 from stores.vectordb import VectorDBProviderFactory
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @asynccontextmanager
@@ -15,8 +17,18 @@ async def lifespan(app: FastAPI):
     # Startup logic
     print("App started")
     app.state.app_config = get_config()
-    app.state.mongo_conn = AsyncIOMotorClient(app.state.app_config.MONGODB_URL)
-    app.state.mongo_db = app.state.mongo_conn[app.state.app_config.MONGO_COLLECTION]
+
+    postgres_username = app.state.app_config.POSTGRES_USERNAME
+    postgres_password = app.state.app_config.POSTGRES_PASSWORD
+    postgres_host = app.state.app_config.POSTGRES_HOST
+    postgres_port = app.state.app_config.POSTGRES_PORT
+    postgres_main_database = app.state.app_config.POSTGRES_MAIN_DATABASE
+
+    postgres_conn_string = f"postgresql+psycopg://{postgres_username}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_main_database}"
+    app.state.db_engine = create_async_engine(postgres_conn_string)
+    app.state.db_client = sessionmaker(
+        app.state.db_engine, expire_on_commit=False, class_=AsyncSession
+    )
 
     # Initialize LLM factory
     llm_factory = LLMFactory(app.state.app_config)
@@ -52,7 +64,7 @@ async def lifespan(app: FastAPI):
     yield
     # Shutdown logic
     print("App shutting down")
-    app.state.mongo_conn.close()
+    await app.state.db_engine.dispose()
     app.state.vector_db_client.disconnect()
 
 
